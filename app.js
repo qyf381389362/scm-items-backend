@@ -23,12 +23,20 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
+app.post('/api/save', (req, post) => {
+    let key = req.params.key;
+    let content = req.params.content;
+    // console.log(key, content, 'post请求已经拿到了数据');
+    console.log(JSON.stringify(req.body));
+});
+
 app.get('/api/test', (req, res) => {
     // ScmItem.find({}, (err, item) => {
     //     res.send(item);
     // });
-    ScmItem.find({}, (err, item) => {
-        console.log(item);
+    ScmItem.find({}, (err, items) => {
+        if (err) console.log(err);
+        console.log(items);
         // res.send(item);
     });
     // console.log(req);

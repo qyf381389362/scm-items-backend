@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 let ScmItem = require('./models/scmItem');
 
-mongoose.connect("mongodb://localhost/scmitem", {
+mongoose.connect("mongodb://admin:admin123@ds159661.mlab.com:59661/scmitem", {
     useNewUrlParser: true
 });
 let db = mongoose.connection;
@@ -19,32 +19,53 @@ db.on('error', function (err) {
 
 const app = express();
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-app.post('/api/save', (req, post) => {
-    let key = req.params.key;
-    let content = req.params.content;
-    // console.log(key, content, 'post请求已经拿到了数据');
-    console.log(JSON.stringify(req.body));
-});
-
-app.get('/api/test', (req, res) => {
-    // ScmItem.find({}, (err, item) => {
-    //     res.send(item);
-    // });
-    ScmItem.find({}, (err, items) => {
-        if (err) console.log(err);
-        console.log(items);
-        // res.send(item);
+app.post('/api/update', (req, res) => {
+    const item = JSON.stringify(req.body)
+    const itemObj = JSON.parse(item);
+    let itemInDataBase;
+    // console.log(itemObj);
+    ScmItem.findOne({"key": itemObj.key}, (err, item) => {
+        new Promise((resolve, reject) => {
+            if (err) reject(err);
+            console.log(item, 'test1');
+            resolve(item);
+            // itemInDataBase = item;
+            // console.log(itemInDataBase, 'test2');
+            // res.send(item);
+        });
+    }).then((item) => {
+        if  (!item) {
+            console.log('为空');
+            let newItem = new ScmItem(itemObj);
+            newItem.save((err) => {
+                if (err) {
+                    console.log(err);
+                    res.send('falied');
+                } else {
+                    res.send('success');
+                }
+            });
+        } else {
+            console.log('不为空');
+            ScmItem.updateOne({"key": itemObj.key}, req.body, (err) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                res.send('success');
+            });
+        }
     });
-    // console.log(req);
-    // res.send('sucess');
 });
 
-app.get('/api/common/members', (req, res) => {
-    ScmItem.find({}, (err, item) => {
+app.get('/api/info', (req, res) => {
+    ScmItem.findOne({ "key": req.query.key}, (err, item) => {
+        if (err) console.log(err);
         res.send(item);
     });
 });

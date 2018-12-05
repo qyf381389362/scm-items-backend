@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 let ScmItem = require('./models/scmItem');
 
+// mongoose.connect("mongodb://localhost/scmitem", {
+//     useNewUrlParser: true
+// });
 mongoose.connect("mongodb://admin:admin123@ds159661.mlab.com:59661/scmitem", {
     useNewUrlParser: true
 });
